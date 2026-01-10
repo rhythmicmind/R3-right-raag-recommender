@@ -1,0 +1,138 @@
+{
+  "project": "R3-right-raag-recommender",
+  "version": "0.1.0",
+  "moods_supported": ["calm", "happy", "energetic", "serious", "sad", "tensed", "longing", "romantic"],
+  "traditions_supported": ["hindustani", "carnatic"],
+  "aliases": {
+    "peaceful": "calm",
+    "relaxed": "calm",
+    "uplifted": "happy",
+    "joyful": "happy",
+    "excited": "energetic",
+    "stressed": "tensed",
+    "anxious": "tensed",
+    "melancholy": "sad",
+    "reflective": "serious",
+    "love": "romantic",
+    "tender": "romantic"
+  },
+  "sources": [
+    {
+      "id": "mathur2015",
+      "tradition": "hindustani",
+      "title": "Emotional responses to Hindustani raga music: the role of musical structure",
+      "venue": "Frontiers in Psychology / PMC",
+      "year": 2015,
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4415143/",
+      "used_for": ["mode (alaap vs gat) emotion clustering", "12-raga set and emotion labels"]
+    },
+    {
+      "id": "koduri2010",
+      "tradition": "carnatic",
+      "title": "A behavioral study of emotions in South Indian classical music and its implications in music recommendation systems",
+      "venue": "ACM",
+      "year": 2010,
+      "url": "https://dl.acm.org/doi/pdf/10.1145/1878061.1878079",
+      "used_for": ["evidence that Carnatic ragas relate to emotion/rasa clusters in listener studies"]
+    }
+  ],
+  "ragas": [
+    {
+      "name": "Hamsadhwani",
+      "tradition": "hindustani",
+      "evidence": ["mathur2015"],
+      "mode_emotion_tags": { "alaap": ["calm"], "gat": ["happy", "energetic"] }
+    },
+    {
+      "name": "Tilak Kamod",
+      "tradition": "hindustani",
+      "evidence": ["mathur2015"],
+      "mode_emotion_tags": { "alaap": ["calm"], "gat": ["happy"] }
+    },
+    {
+      "name": "Desh",
+      "tradition": "hindustani",
+      "evidence": ["mathur2015"],
+      "mode_emotion_tags": { "alaap": ["calm"], "gat": ["happy"] }
+    },
+    {
+      "name": "Yaman",
+      "tradition": "hindustani",
+      "evidence": ["mathur2015"],
+      "mode_emotion_tags": { "alaap": ["calm"], "gat": ["happy"] }
+    },
+    {
+      "name": "Rageshree",
+      "tradition": "hindustani",
+      "evidence": ["mathur2015"],
+      "mode_emotion_tags": { "alaap": ["calm"], "gat": ["happy"] }
+    },
+    {
+      "name": "Jog",
+      "tradition": "hindustani",
+      "evidence": ["mathur2015"],
+      "mode_emotion_tags": { "alaap": ["calm"], "gat": ["happy"] }
+    },
+    {
+      "name": "Malkauns",
+      "tradition": "hindustani",
+      "evidence": ["mathur2015"],
+      "mode_emotion_tags": { "alaap": ["sad", "serious"], "gat": ["tensed", "longing"] }
+    },
+    {
+      "name": "Shree",
+      "tradition": "hindustani",
+      "evidence": ["mathur2015"],
+      "mode_emotion_tags": { "alaap": ["sad", "serious"], "gat": ["tensed"] }
+    },
+    {
+      "name": "Marwa",
+      "tradition": "hindustani",
+      "evidence": ["mathur2015"],
+      "mode_emotion_tags": { "alaap": ["sad"], "gat": ["tensed"] }
+    },
+    {
+      "name": "Miyan ki Todi",
+      "tradition": "hindustani",
+      "evidence": ["mathur2015"],
+      "mode_emotion_tags": { "alaap": ["sad"], "gat": ["tensed"] }
+    },
+    {
+      "name": "Basant Mukhari",
+      "tradition": "hindustani",
+      "evidence": ["mathur2015"],
+      "mode_emotion_tags": { "alaap": ["sad"], "gat": ["longing", "tensed"] }
+    },
+    {
+      "name": "Lalit",
+      "tradition": "hindustani",
+      "evidence": ["mathur2015"],
+      "mode_emotion_tags": { "alaap": ["sad"], "gat": ["longing"] }
+    },
+
+    {
+      "name": "Ananda Bhairavi",
+      "tradition": "carnatic",
+      "evidence": ["koduri2010"],
+      "emotion_tags": ["calm", "romantic", "longing"]
+    },
+    {
+      "name": "Kalyani",
+      "tradition": "carnatic",
+      "evidence": ["koduri2010"],
+      "emotion_tags": ["calm", "happy"]
+    },
+    {
+      "name": "Mohanam",
+      "tradition": "carnatic",
+      "evidence": ["koduri2010"],
+      "emotion_tags": ["happy", "energetic"]
+    },
+    {
+      "name": "Shankarabharanam",
+      "tradition": "carnatic",
+      "evidence": ["koduri2010"],
+      "emotion_tags": ["serious", "calm"]
+    }
+  ]
+}
