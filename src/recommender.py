@@ -1,62 +1,91 @@
 import json
 import random
 from pathlib import Path
+from typing import Optional, Dict, Any, List
 
 DATA_PATH = Path(__file__).resolve().parents[1] / "data" / "ragas.json"
 
-def load_data(path: Path = DATA_PATH) -> dict:
+
+def _norm(s: str) -> str:
+    return " ".join(s.strip().lower().split())
+
+
+def load_data(path: Path = DATA_PATH) -> Dict[str, Any]:
     with open(path, "r", encoding="utf-8") as f:
         return json.load(f)
 
-def normalize(s: str) -> str:
-    return " ".join(s.strip().lower().split())
 
-def resolve_alias(mood: str, aliases: dict) -> str:
-    mood_n = normalize(mood)
-    return normalize(aliases.get(mood_n, mood_n))
+def resolve_alias(mood: str, aliases: Dict[str, str]) -> str:
+    m = _norm(mood)
+    return _norm(aliases.get(m, m))
 
-def filter_ragas(data: dict, tradition: str | None) -> list[dict]:
-    ragas = data.get("ragas", [])
-    if not tradition or tradition == "surprise":
+
+def filter_by_tradition(ragas: List[Dict[str, Any]], tradition: str) -> List[Dict[str, Any]]:
+    t = _norm(tradition)
+    if t in ("", "surprise", "either", "any"):
         return ragas
-    t = normalize(tradition)
-    return [r for r in ragas if normalize(r.get("tradition", "")) == t]
+    return [r for r in ragas if _norm(r.get("tradition", "")) == t]
+
 
 def recommend_raaga(
     mood: str,
     tradition: str = "surprise",
-    mode: str | None = None,
-    seed: int | None = None,
+    mode: Optional[str] = None,          # alaap/gat for Hindustani
+    seed: Optional[int] = None,
     data_path: Path = DATA_PATH
-) -> dict:
+) -> Dict[str, Any]:
     """
-    Returns a dict with keys:
-      - raaga, tradition, mood, mode, evidence
+    Returns:
+      {
+        raaga: str|None,
+        tradition: str,
+        mood: str,
+        mode: str|None,
+        evidence: list[str],
+        error?: str
+      }
     """
     data = load_data(data_path)
     aliases = data.get("aliases", {})
     mood_resolved = resolve_alias(mood, aliases)
 
-    pool = filter_ragas(data, tradition)
+    ragas = data.get("ragas", [])
+    pool = filter_by_tradition(ragas, tradition)
 
     candidates = []
+    requested_mode = _norm(mode) if mode else None
+
     for r in pool:
-        t = normalize(r.get("tradition", ""))
         name = r.get("name")
+        tr = _norm(r.get("tradition", ""))
         evidence = r.get("evidence", [])
 
-        # Hindustani can be mode-aware if mode_emotion_tags exists
-        if "mode_emotion_tags" in r and mode:
-            m = normalize(mode)
-            tags = r["mode_emotion_tags"].get(m, [])
-            tags = [normalize(x) for x in tags]
+        # Hindustani: mode-aware tags
+        if "mode_emotion_tags" in r:
+            if requested_mode:
+                tags = r["mode_emotion_tags"].get(requested_mode, [])
+                tags = [_norm(x) for x in tags]
+                if mood_resolved in tags:
+                    candidates.append(
+                        {"raaga": name, "tradition": tr, "mode": requested_mode, "evidence": evidence}
+                    )
+            else:
+                # If mode not specified, allow match in either mode
+                for m, tags in r["mode_emotion_tags"].items():
+                    tags = [_norm(x) for x in tags]
+                    if mood_resolved in tags:
+                        candidates.append(
+                            {"raaga": name, "tradition": tr, "mode": _norm(m), "evidence": evidence}
+                        )
+                        break
+
+        # Carnatic (or others): emotion_tags
+        elif "emotion_tags" in r:
+            tags = [_norm(x) for x in r.get("emotion_tags", [])]
             if mood_resolved in tags:
-                candidates.append({"raaga": name, "tradition": t, "mode": m, "evidence": evidence})
-        else:
-            tags = r.get("emotion_tags", [])
-            tags = [normalize(x) for x in tags]
-            if mood_resolved in tags:
-                candidates.append({"raaga": name, "tradition": t, "mode": None, "evidence": evidence})
+                candidates.append(
+                    {"raaga": name, "tradition": tr, "mode": None, "evidence": evidence}
+                )
 
     if seed is not None:
         random.seed(seed)
@@ -64,9 +93,9 @@ def recommend_raaga(
     if not candidates:
         return {
             "raaga": None,
-            "tradition": tradition,
+            "tradition": _norm(tradition),
             "mood": mood_resolved,
-            "mode": mode,
+            "mode": requested_mode,
             "evidence": [],
             "error": "No matching raaga found for the selected mood/tradition/mode."
         }
